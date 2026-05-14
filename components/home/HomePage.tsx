@@ -83,7 +83,9 @@ export function HomePage(props: {
 
   const cousinById = useMemo(() => new Map(cousins.map((c) => [c.id, c])), [cousins]);
 
-  const endsInDays = activeChallenge?.ends_at ? daysUntil(activeChallenge.ends_at) : null;
+  {endsInDays != null ? (
+  <span className="text-[11px] text-zinc-400">Challenge active</span>
+) : null}
 
   return (
     <div className="space-y-16">
