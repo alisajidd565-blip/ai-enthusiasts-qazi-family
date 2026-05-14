@@ -76,6 +76,7 @@ export default async function Page() {
         </div>
         <Link
           href="/admin/login"
+          prefetch={false}
           className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-zinc-200 backdrop-blur transition hover:border-cyan-400/30 hover:bg-white/10 sm:text-sm"
         >
           Admin
