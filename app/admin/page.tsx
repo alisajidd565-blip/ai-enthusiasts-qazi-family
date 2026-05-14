@@ -26,9 +26,10 @@ export default async function AdminHome() {
       supabase.from("submissions").select("*").order("submitted_at", { ascending: false }).limit(800),
     ]);
 
-    if (cousinsError) throw new Error(Cousins error: ${cousinsError.message});
-    if (challengesError) throw new Error(Challenges error: ${challengesError.message});
-    if (submissionsError) throw new Error(Submissions error: ${submissionsError.message});
+    // FIXED: Correct variable names with backticks
+    if (cousinsError) throw new Error(`Cousins error: ${cousinsError.message}`);
+    if (challengesError) throw new Error(`Challenges error: ${challengesError.message}`);
+    if (submissionsError) throw new Error(`Submissions error: ${submissionsError.message}`);
 
     return (
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
