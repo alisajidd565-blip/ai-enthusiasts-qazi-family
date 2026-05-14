@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
@@ -8,6 +7,23 @@ import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Challenge, Cousin, Submission } from "@/lib/types";
 import { daysUntil } from "@/lib/stats";
+
+function safeFormatDate(iso: string | null | undefined, fmt: string) {
+  if (!iso) return "—";
+  const d = parseISO(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return format(d, fmt);
+}
+
+function initialsFromName(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return "?";
+  return parts
+    .map((p) => p[0] ?? "")
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
 
 type BoardRow = {
   cousin: Cousin;
@@ -115,7 +131,7 @@ export function HomePage(props: {
           </div>
           {activeChallenge ? (
             <div className="hidden text-right text-xs text-zinc-400 sm:block">
-              <div className="text-sm text-zinc-200">{format(parseISO(activeChallenge.challenge_date), "MMM d, yyyy")}</div>
+              <div className="text-sm text-zinc-200">{safeFormatDate(activeChallenge.challenge_date, "MMM d, yyyy")}</div>
               <div className="mt-1 inline-flex items-center gap-2">
                 <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] uppercase tracking-wide text-zinc-200">
                   {activeChallenge.difficulty}
@@ -136,7 +152,7 @@ export function HomePage(props: {
             {!activeChallenge ? (
               <div className="text-zinc-300">
                 No active challenge yet. Create one in{" "}
-                <Link className="text-cyan-300 underline" href="/admin">
+                <Link className="text-cyan-300 underline" href="/admin/login" prefetch={false}>
                   Admin
                 </Link>
                 .
@@ -144,7 +160,7 @@ export function HomePage(props: {
             ) : (
               <div className="space-y-4">
                 <div className="text-sm text-zinc-400 sm:hidden">
-                  {format(parseISO(activeChallenge.challenge_date), "MMM d, yyyy")} ·{" "}
+                  {safeFormatDate(activeChallenge.challenge_date, "MMM d, yyyy")} ·{" "}
                   <span className="text-zinc-200">{activeChallenge.difficulty}</span>
                 </div>
                 <blockquote className="text-lg leading-relaxed text-zinc-100 sm:text-2xl">
@@ -179,12 +195,11 @@ export function HomePage(props: {
                   onClick={() => setLightbox({ src: bestMonth.image_url, alt: "Best of month" })}
                   className="group relative aspect-video w-full overflow-hidden rounded-xl border border-white/10 bg-black/30"
                 >
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={bestMonth.image_url}
                     alt="Best of month"
-                    fill
-                    className="object-cover transition duration-500 group-hover:scale-[1.03]"
-                    sizes="(min-width: 1024px) 33vw, 100vw"
+                    className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                   />
                 </button>
                 <div className="text-sm text-zinc-200">
@@ -256,7 +271,12 @@ export function HomePage(props: {
               className="glass group relative overflow-hidden rounded-2xl text-left"
             >
               <div className="relative aspect-[4/3] w-full">
-                <Image src={s.image_url} alt="Hall of fame" fill className="object-cover transition duration-500 group-hover:scale-[1.04]" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={s.image_url}
+                  alt="Hall of fame"
+                  className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                 <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2">
                   <div className="text-sm font-semibold text-white">
@@ -347,12 +367,7 @@ export function HomePage(props: {
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-zinc-200">
-                          {cousin.display_name
-                            .split(" ")
-                            .map((p) => p[0])
-                            .join("")
-                            .slice(0, 2)
-                            .toUpperCase()}
+                          {initialsFromName(cousin.display_name)}
                         </div>
                       )}
                     </div>
@@ -377,11 +392,11 @@ export function HomePage(props: {
                         onClick={() => setLightbox({ src: latest.image_url, alt: `${cousin.display_name} latest` })}
                         className="group relative aspect-video overflow-hidden rounded-2xl border border-white/10 bg-black/30 sm:col-span-2"
                       >
-                        <Image
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
                           src={latest.image_url}
                           alt={`${cousin.display_name} latest submission`}
-                          fill
-                          className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                          className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                         />
                         <div className="absolute left-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-[11px] text-white backdrop-blur">
                           Latest
@@ -390,9 +405,7 @@ export function HomePage(props: {
                       <div className="sm:col-span-3">
                         <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
                           <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
-                            <span>
-                              {format(parseISO(latest.submitted_at), "MMM d, yyyy")}
-                            </span>
+                            <span>{safeFormatDate(latest.submitted_at, "MMM d, yyyy")}</span>
                             <span className="rounded-full bg-white/5 px-2 py-0.5 text-zinc-200">
                               Score {Number(latest.final_score).toFixed(1)}/10
                             </span>
@@ -435,6 +448,7 @@ export function HomePage(props: {
                     {isAdmin ? (
                       <Link
                         href={`/admin?cousin=${encodeURIComponent(cousin.slug)}`}
+                        prefetch={false}
                         className="rounded-full bg-gradient-to-r from-cyan-400/90 to-fuchsia-400/90 px-4 py-2 text-xs font-semibold text-zinc-950 transition hover:brightness-110"
                       >
                         Admin: upload / edit
@@ -451,7 +465,8 @@ export function HomePage(props: {
                           onClick={() => setLightbox({ src: s.image_url, alt: "History" })}
                           className="relative h-16 w-24 flex-none overflow-hidden rounded-xl border border-white/10 bg-black/30"
                         >
-                          <Image src={s.image_url} alt="Thumbnail" fill className="object-cover" />
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={s.image_url} alt="Thumbnail" className="absolute inset-0 h-full w-full object-cover" />
                         </button>
                       ))}
                     </div>
