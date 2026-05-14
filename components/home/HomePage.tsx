@@ -82,10 +82,8 @@ export function HomePage(props: {
   }, [hallSubs, leaderboard, subsByCousin]);
 
   const cousinById = useMemo(() => new Map(cousins.map((c) => [c.id, c])), [cousins]);
-
-  {endsInDays != null ? (
-  <span className="text-[11px] text-zinc-400">Challenge active</span>
-) : null}
+  
+  const endsInDays = null;
 
   return (
     <div className="space-y-16">
