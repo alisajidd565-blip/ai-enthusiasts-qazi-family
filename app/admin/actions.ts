@@ -51,6 +51,7 @@ export async function createChallenge(formData: FormData) {
   const difficulty = String(formData.get("difficulty") ?? "medium");
   const challengeDate = String(formData.get("challenge_date") ?? "").trim();
   const endsAtRaw = String(formData.get("ends_at") ?? "").trim();
+  const referenceFile = formData.get("reference_image");
 
   if (!prompt) throw new Error("Prompt is required");
   if (!challengeDate) throw new Error("Date is required");
@@ -58,12 +59,23 @@ export async function createChallenge(formData: FormData) {
   const admin = createAdminClient();
   const endsAt = endsAtRaw ? new Date(endsAtRaw).toISOString() : null;
 
+  let referenceImageUrl: string | null = null;
+  let referenceCloudinaryId: string | null = null;
+  if (referenceFile instanceof Blob && referenceFile.size > 0) {
+    const buffer = Buffer.from(await referenceFile.arrayBuffer());
+    const uploaded = await uploadImageBuffer({ buffer, folder: "qazi-family/references" });
+    referenceImageUrl = uploaded.secure_url;
+    referenceCloudinaryId = uploaded.public_id;
+  }
+
   const { error } = await admin.from("challenges").insert({
     prompt,
     challenge_date: challengeDate,
     difficulty,
     ends_at: endsAt,
     is_active: true,
+    reference_image_url: referenceImageUrl,
+    reference_cloudinary_id: referenceCloudinaryId,
   });
   if (error) throw new Error(error.message);
 
@@ -83,6 +95,9 @@ export async function updateChallenge(formData: FormData) {
   const isActive = String(formData.get("is_active") ?? "");
   const endsAtRaw = String(formData.get("ends_at") ?? "").trim();
 
+  const referenceFile = formData.get("reference_image");
+  const removeReference = String(formData.get("remove_reference") ?? "") === "true";
+
   if (prompt) patch.prompt = prompt;
   if (difficulty) patch.difficulty = difficulty;
   if (challengeDate) patch.challenge_date = challengeDate;
@@ -90,6 +105,17 @@ export async function updateChallenge(formData: FormData) {
   patch.ends_at = endsAtRaw ? new Date(endsAtRaw).toISOString() : null;
 
   const admin = createAdminClient();
+
+  if (referenceFile instanceof Blob && referenceFile.size > 0) {
+    const buffer = Buffer.from(await referenceFile.arrayBuffer());
+    const uploaded = await uploadImageBuffer({ buffer, folder: "qazi-family/references" });
+    patch.reference_image_url = uploaded.secure_url;
+    patch.reference_cloudinary_id = uploaded.public_id;
+  } else if (removeReference) {
+    patch.reference_image_url = null;
+    patch.reference_cloudinary_id = null;
+  }
+
   const { error } = await admin.from("challenges").update(patch).eq("id", id);
   if (error) throw new Error(error.message);
 
@@ -167,9 +193,11 @@ export async function uploadSubmission(formData: FormData) {
   }
 
   let challengePrompt = "General creative AI image.";
+  let referenceImageUrl: string | null = null;
   if (challengeId) {
-    const { data: ch } = await admin.from("challenges").select("prompt").eq("id", challengeId).maybeSingle();
+    const { data: ch } = await admin.from("challenges").select("prompt, reference_image_url").eq("id", challengeId).maybeSingle();
     if (ch?.prompt) challengePrompt = ch.prompt;
+    if (ch?.reference_image_url) referenceImageUrl = ch.reference_image_url;
   }
 
   const { data: inserted, error } = await admin
@@ -188,7 +216,7 @@ export async function uploadSubmission(formData: FormData) {
   const submissionId = inserted.id as string;
 
   try {
-    const judge = await judgeSubmissionWithGroq({ challengePrompt, imageUrl: uploaded.secure_url });
+    const judge = await judgeSubmissionWithGroq({ challengePrompt, imageUrl: uploaded.secure_url, referenceImageUrl });
     const { error: upErr } = await admin
       .from("submissions")
       .update({
@@ -304,13 +332,15 @@ export async function reJudgeSubmission(formData: FormData) {
   if (!sub) throw new Error("Submission not found");
 
   let challengePrompt = "General creative AI image.";
+  let rejudgeReferenceUrl: string | null = null;
   if (sub.challenge_id) {
-    const { data: ch } = await admin.from("challenges").select("prompt").eq("id", sub.challenge_id).maybeSingle();
+    const { data: ch } = await admin.from("challenges").select("prompt, reference_image_url").eq("id", sub.challenge_id).maybeSingle();
     if (ch?.prompt) challengePrompt = ch.prompt;
+    if (ch?.reference_image_url) rejudgeReferenceUrl = ch.reference_image_url;
   }
 
   try {
-    const judge = await judgeSubmissionWithGroq({ challengePrompt, imageUrl: sub.image_url });
+    const judge = await judgeSubmissionWithGroq({ challengePrompt, imageUrl: sub.image_url, referenceImageUrl: rejudgeReferenceUrl });
     const { error } = await admin
       .from("submissions")
       .update({
