@@ -166,6 +166,19 @@ export function HomePage(props: {
                 <blockquote className="text-lg leading-relaxed text-zinc-100 sm:text-2xl">
                   “{activeChallenge.prompt}”
                 </blockquote>
+                {activeChallenge.reference_image_url && (
+                  <div className="mt-4 space-y-2">
+                    <p className="text-sm font-medium text-cyan-300 uppercase tracking-wide">📎 Reference Image — modify this image according to the prompt above</p>
+                    <div className="overflow-hidden rounded-2xl border border-cyan-400/20 bg-black/30">
+                      <img
+                        src={activeChallenge.reference_image_url}
+                        alt="Challenge reference image"
+                        className="w-full max-h-96 object-contain"
+                      />
+                    </div>
+                    <p className="text-xs text-zinc-500">Use this image as your starting point. Your submission should reflect the changes described in the prompt.</p>
+                  </div>
+                )}
                 <div className="flex flex-wrap gap-2 text-xs text-zinc-400">
                   <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1">Groq vision judging</span>
                   <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1">Cloudinary originals</span>
@@ -261,12 +274,9 @@ export function HomePage(props: {
             </div>
           ) : null}
           {hallCards.map((s) => (
-            <motion.button
+            <button
               type="button"
               key={s.id}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
               onClick={() => setLightbox({ src: s.image_url, alt: "Hall of fame" })}
               className="glass group relative overflow-hidden rounded-2xl text-left"
             >
@@ -275,6 +285,8 @@ export function HomePage(props: {
                 <img
                   src={s.image_url}
                   alt="Hall of fame"
+                  loading="lazy"
+                  decoding="async"
                   className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
@@ -287,7 +299,7 @@ export function HomePage(props: {
                   </div>
                 </div>
               </div>
-            </motion.button>
+            </button>
           ))}
         </div>
       </section>
@@ -300,11 +312,8 @@ export function HomePage(props: {
 
         <div className="grid gap-3">
           {leaderboard.map((row) => (
-            <motion.div
+            <div
               key={row.cousin.id}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
               className="glass flex items-center justify-between gap-4 rounded-2xl p-4"
             >
               <div className="flex items-center gap-4">
@@ -330,7 +339,7 @@ export function HomePage(props: {
                 <div className="text-2xl font-semibold tracking-tight text-cyan-200">{row.totalScore.toFixed(1)}</div>
                 <div className="text-[11px] uppercase tracking-wide text-zinc-500">total</div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </section>
@@ -347,11 +356,8 @@ export function HomePage(props: {
             const latest = list[0];
             const row = leaderboard.find((r) => r.cousin.id === cousin.id);
             return (
-              <motion.article
+              <article
                 key={cousin.id}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
                 className="glass relative overflow-hidden rounded-3xl"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-fuchsia-500/5" />
@@ -363,6 +369,8 @@ export function HomePage(props: {
                         <img
                           src={cousin.profile_image_url}
                           alt={cousin.display_name}
+                          loading="lazy"
+                          decoding="async"
                           className="h-full w-full object-cover"
                         />
                       ) : (
@@ -396,6 +404,8 @@ export function HomePage(props: {
                         <img
                           src={latest.image_url}
                           alt={`${cousin.display_name} latest submission`}
+                          loading="lazy"
+                          decoding="async"
                           className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                         />
                         <div className="absolute left-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-[11px] text-white backdrop-blur">
@@ -458,7 +468,7 @@ export function HomePage(props: {
 
                   {list.length > 1 ? (
                     <div className="flex gap-2 overflow-x-auto pb-1">
-                      {list.slice(0, 12).map((s) => (
+                      {list.slice(0, 6).map((s) => (
                         <button
                           type="button"
                           key={s.id}
@@ -466,13 +476,13 @@ export function HomePage(props: {
                           className="relative h-16 w-24 flex-none overflow-hidden rounded-xl border border-white/10 bg-black/30"
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={s.image_url} alt="Thumbnail" className="absolute inset-0 h-full w-full object-cover" />
+                          <img src={s.image_url} alt="Thumbnail" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
                         </button>
                       ))}
                     </div>
                   ) : null}
                 </div>
-              </motion.article>
+              </article>
             );
           })}
         </div>
