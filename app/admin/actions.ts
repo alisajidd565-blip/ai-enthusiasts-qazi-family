@@ -8,7 +8,7 @@ import { ADMIN_COOKIE, createAdminToken } from "@/lib/auth";
 import { assertAdmin } from "@/lib/admin-guard";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { deleteCloudinaryAsset, uploadImageBuffer } from "@/lib/cloudinary";
-import { judgeSubmissionWithGemini } from "@/lib/gemini";
+import { judgeSubmissionWithGroq } from "@/lib/groq";
 
 function safeEqual(a: string, b: string) {
   const ba = Buffer.from(a);
@@ -188,7 +188,7 @@ export async function uploadSubmission(formData: FormData) {
   const submissionId = inserted.id as string;
 
   try {
-    const judge = await judgeSubmissionWithGemini({ challengePrompt, imageUrl: uploaded.secure_url });
+    const judge = await judgeSubmissionWithGroq({ challengePrompt, imageUrl: uploaded.secure_url });
     const { error: upErr } = await admin
       .from("submissions")
       .update({
@@ -210,7 +210,7 @@ export async function uploadSubmission(formData: FormData) {
     await admin
       .from("submissions")
       .update({
-        feedback: `Gemini judging failed — you can set a manual score below. (${message})`,
+        feedback: `Groq judging failed — you can set a manual score below. (${message})`,
         gemini_raw: { error: message } as never,
       })
       .eq("id", submissionId);
@@ -310,7 +310,7 @@ export async function reJudgeSubmission(formData: FormData) {
   }
 
   try {
-    const judge = await judgeSubmissionWithGemini({ challengePrompt, imageUrl: sub.image_url });
+    const judge = await judgeSubmissionWithGroq({ challengePrompt, imageUrl: sub.image_url });
     const { error } = await admin
       .from("submissions")
       .update({
@@ -332,7 +332,7 @@ export async function reJudgeSubmission(formData: FormData) {
     await admin
       .from("submissions")
       .update({
-        feedback: `Gemini judging failed — ${message}`,
+        feedback: `Groq judging failed — ${message}`,
         gemini_raw: { error: message } as never,
       })
       .eq("id", id);
