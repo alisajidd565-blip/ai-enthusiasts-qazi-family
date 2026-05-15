@@ -103,7 +103,7 @@ export function HomePage(props: {
             </span>
           </h1>
           <p className="max-w-2xl text-base leading-relaxed text-zinc-300 sm:text-lg">
-            Daily prompts, cousin chaos, and Gemini-powered judging. Uploads are private to the family—scores
+            Daily prompts, cousin chaos, and Groq-powered judging. Uploads are private to the family—scores
             are loud, the roasts are (mostly) affectionate, and the leaderboard never forgets.
           </p>
           <div className="flex flex-wrap gap-3">
@@ -167,7 +167,7 @@ export function HomePage(props: {
                   “{activeChallenge.prompt}”
                 </blockquote>
                 <div className="flex flex-wrap gap-2 text-xs text-zinc-400">
-                  <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1">Gemini vision judging</span>
+                  <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1">Groq vision judging</span>
                   <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1">Cloudinary originals</span>
                   <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1">Supabase history</span>
                 </div>
@@ -338,7 +338,7 @@ export function HomePage(props: {
       <section id="cousins" className="scroll-mt-24 space-y-6">
         <div>
           <h2 className="font-display text-2xl font-semibold sm:text-3xl">The roster</h2>
-          <p className="mt-2 text-sm text-zinc-400">Profiles, galleries, and Gemini commentary.</p>
+          <p className="mt-2 text-sm text-zinc-400">Profiles, galleries, and Groq commentary.</p>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
@@ -411,7 +411,7 @@ export function HomePage(props: {
                             </span>
                           </div>
                           <div className="mt-3 text-sm text-zinc-200">
-                            {latest.feedback ? latest.feedback : "Judging notes will appear here after Gemini runs."}
+                            {latest.feedback ? latest.feedback : "Judging notes will appear here after Groq runs."}
                           </div>
                           {latest.improvement_tips ? (
                             <div className="mt-3 text-sm text-zinc-400">
