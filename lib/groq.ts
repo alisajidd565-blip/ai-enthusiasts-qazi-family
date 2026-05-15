@@ -1,4 +1,4 @@
-import Groq from "groq-sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export type JudgeResult = {
   creativity: number;
@@ -29,13 +29,13 @@ function parseJudgeJson(text: string): JudgeResult {
   };
 }
 
-export async function judgeSubmissionWithGroq(params: {
+export async function judgeSubmissionWithGemini(params: {
   challengePrompt: string;
   imageUrl: string;
 }): Promise<JudgeResult> {
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error("Missing GROQ_API_KEY");
+    throw new Error("Missing GEMINI_API_KEY");
   }
 
   const imageResp = await fetch(params.imageUrl);
@@ -46,8 +46,14 @@ export async function judgeSubmissionWithGroq(params: {
   const buffer = Buffer.from(await imageResp.arrayBuffer());
   const base64 = buffer.toString("base64");
 
-  const modelName = process.env.GROQ_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct";
-  const groq = new Groq({ apiKey });
+  const modelName = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: modelName,
+    generationConfig: {
+      responseMimeType: "application/json",
+    },
+  });
 
   const instruction = [
     "You are the head judge for a private family AI image competition.",
@@ -63,25 +69,16 @@ export async function judgeSubmissionWithGroq(params: {
     params.challengePrompt,
   ].join("\n");
 
-  const response = await groq.chat.completions.create({
-    model: modelName,
-    messages: [
-      {
-        role: "user",
-        content: [
-          { type: "text", text: instruction },
-          {
-            type: "image_url",
-            image_url: {
-              url: `data:${mimeType};base64,${base64}`,
-            },
-          },
-        ],
+  const result = await model.generateContent([
+    { text: instruction },
+    {
+      inlineData: {
+        mimeType,
+        data: base64,
       },
-    ],
-    response_format: { type: "json_object" },
-  });
+    },
+  ]);
 
-  const text = response.choices[0]?.message?.content ?? "";
+  const text = result.response.text();
   return parseJudgeJson(text);
 }
