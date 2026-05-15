@@ -72,7 +72,7 @@ export default async function Page() {
     <main className="mx-auto max-w-6xl px-4 pb-24 pt-10 sm:px-6 lg:px-8">
       <div className="mb-8 flex items-center justify-between gap-4">
         <div className="text-xs text-zinc-400 sm:text-sm">
-          Private family arena · Gemini judging · Cloudinary storage · Supabase records
+          Private family arena · Groq judging · Cloudinary storage · Supabase records
         </div>
         <Link
           href="/admin/login"
