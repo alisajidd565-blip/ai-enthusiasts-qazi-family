@@ -25,9 +25,15 @@ create table if not exists public.challenges (
   difficulty text not null default 'medium' check (difficulty in ('easy', 'medium', 'hard', 'legendary')),
   ends_at timestamptz,
   is_active boolean not null default true,
+  reference_image_url text,
+  reference_cloudinary_id text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Migration: add reference image columns if table already exists
+alter table public.challenges add column if not exists reference_image_url text;
+alter table public.challenges add column if not exists reference_cloudinary_id text;
 
 create index if not exists challenges_date_idx on public.challenges (challenge_date desc);
 create index if not exists challenges_active_idx on public.challenges (is_active);
