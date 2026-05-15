@@ -19,7 +19,7 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: "AI Enthusiasts – Qazi Family",
-  description: "Private family AI image competition, judged by Gemini.",
+  description: "Private family AI image competition, judged by Groq.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
