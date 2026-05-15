@@ -55,7 +55,7 @@ export function AdminDashboard(props: {
           <div className="text-xs uppercase tracking-wide text-zinc-400">Admin</div>
           <h1 className="mt-2 font-display text-3xl font-semibold">Control room</h1>
           <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-            Uploads trigger Cloudinary storage + Gemini judging. The homepage updates automatically after each action.
+            Uploads trigger Cloudinary storage + Groq judging. The homepage updates automatically after each action.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -77,7 +77,7 @@ export function AdminDashboard(props: {
       </header>
 
       <section className="glass rounded-3xl p-6">
-        <h2 className="font-display text-xl font-semibold">Upload a submission (Gemini judging)</h2>
+        <h2 className="font-display text-xl font-semibold">Upload a submission (Groq judging)</h2>
         <p className="mt-2 text-sm text-zinc-400">
           Pick the cousin and (optionally) the challenge. If challenge is blank, the newest active challenge is used.
         </p>
@@ -320,7 +320,7 @@ export function AdminDashboard(props: {
 
       <section className="glass rounded-3xl p-6">
         <h2 className="font-display text-xl font-semibold">Submissions</h2>
-        <p className="mt-2 text-sm text-zinc-400">Manual scoring overrides totals. Re-judge re-runs Gemini on the stored image URL.</p>
+        <p className="mt-2 text-sm text-zinc-400">Manual scoring overrides totals. Re-judge re-runs Groq on the stored image URL.</p>
 
         <div className="mt-5 space-y-4">
           {submissions.map((s) => {
