@@ -17,6 +17,8 @@ export type Challenge = {
   difficulty: Difficulty;
   ends_at: string | null;
   is_active: boolean;
+  reference_image_url: string | null;
+  reference_cloudinary_id: string | null;
   created_at?: string;
   updated_at?: string;
 };
