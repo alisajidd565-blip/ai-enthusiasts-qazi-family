@@ -12,7 +12,7 @@ import {
 } from "@/lib/stats";
 import { HomePage } from "@/components/home/HomePage";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // rebuild at most every 60 seconds
 
 async function loadHomeData(): Promise<{
   cousins: Cousin[];
@@ -24,8 +24,8 @@ async function loadHomeData(): Promise<{
     const supabase = createPublicClient();
     const [{ data: cousins }, { data: challenges }, { data: submissions }, { data: hall }] = await Promise.all([
       supabase.from("cousins").select("*").order("sort_order", { ascending: true }),
-      supabase.from("challenges").select("*").order("challenge_date", { ascending: false }).limit(60),
-      supabase.from("submissions").select("*").order("submitted_at", { ascending: false }).limit(800),
+      supabase.from("challenges").select("*").order("challenge_date", { ascending: false }).limit(20),
+      supabase.from("submissions").select("id,cousin_id,challenge_id,image_url,submitted_at,creativity,adherence,realism,overall_ai,final_score,feedback,improvement_tips,roast,judged_at").order("submitted_at", { ascending: false }).limit(200),
       supabase.from("hall_of_fame").select("submission_id").limit(50),
     ]);
 
