@@ -232,6 +232,16 @@ export function AdminDashboard(props: {
               className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:ring focus:ring-cyan-400/30"
             />
           </label>
+          <label className="md:col-span-2 block text-sm text-zinc-300">
+            Reference Image (optional — shown to participants as the image to modify)
+            <input
+              name="reference_image"
+              type="file"
+              accept="image/*"
+              className="mt-2 block w-full text-sm text-zinc-200"
+            />
+            <p className="mt-1 text-xs text-zinc-500">Upload the image participants should recreate or modify.</p>
+          </label>
           <div className="md:col-span-2">
             <SubmitButton className="rounded-xl bg-white/10 px-4 py-2 text-sm hover:bg-white/15 disabled:opacity-60">
               Create challenge
@@ -296,6 +306,27 @@ export function AdminDashboard(props: {
                   defaultValue={ch.ends_at ? format(parseISO(ch.ends_at), "yyyy-MM-dd'T'HH:mm") : ""}
                   className="w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:ring focus:ring-cyan-400/30"
                 />
+                <div className="space-y-2">
+                  <p className="text-sm text-zinc-300">Reference Image</p>
+                  {ch.reference_image_url && (
+                    <div className="flex items-center gap-3">
+                      <img src={ch.reference_image_url} alt="Reference" className="h-16 w-16 rounded-lg object-cover border border-white/10" />
+                      <div className="flex items-center gap-2">
+                        <label className="flex items-center gap-1 text-xs text-red-400 cursor-pointer">
+                          <input type="checkbox" name="remove_reference" value="true" className="accent-red-400" />
+                          Remove reference image
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                  <input
+                    name="reference_image"
+                    type="file"
+                    accept="image/*"
+                    className="block w-full text-sm text-zinc-200"
+                  />
+                  <p className="text-xs text-zinc-500">{ch.reference_image_url ? "Upload a new image to replace the current one." : "Upload an image participants should recreate or modify."}</p>
+                </div>
                 <SubmitButton className="rounded-xl bg-white/10 px-4 py-2 text-sm hover:bg-white/15 disabled:opacity-60">
                   Save changes
                 </SubmitButton>
